@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 The Android Open Source Project
+ * Copyright (C) 2019 The AospExtended Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,32 @@
 package com.android.settings.deviceinfo.firmwareversion;
 
 import android.content.Context;
-import android.os.Build;
-import android.text.BidiFormatter;
+import android.os.SystemProperties;
+import android.text.TextUtils;
 
+import androidx.annotation.VisibleForTesting;
+
+import com.android.settings.R;
+import com.android.settings.Utils;
 import com.android.settings.core.BasePreferenceController;
 
-public class SimpleBuildNumberPreferenceController extends BasePreferenceController {
+public class BuildDatePreferenceController extends BasePreferenceController {
 
-    public SimpleBuildNumberPreferenceController(Context context,
-            String preferenceKey) {
+    @VisibleForTesting
+    static final String BUILD_DATE_PROPERTY = "ro.build.date";
+
+    public BuildDatePreferenceController(Context context, String preferenceKey) {
         super(context, preferenceKey);
     }
 
     @Override
     public int getAvailabilityStatus() {
-        return AVAILABLE_UNSEARCHABLE;
+        return !TextUtils.isEmpty(SystemProperties.get(BUILD_DATE_PROPERTY)) ? AVAILABLE : UNSUPPORTED_ON_DEVICE;
     }
 
     @Override
     public CharSequence getSummary() {
-        return BidiFormatter.getInstance().unicodeWrap(Build.DISPLAY);
+        return SystemProperties.get(BUILD_DATE_PROPERTY,
+                mContext.getString(R.string.device_info_default));
     }
 }
