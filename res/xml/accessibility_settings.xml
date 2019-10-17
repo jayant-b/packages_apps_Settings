@@ -46,7 +46,8 @@
             android:key="display_category"
             android:title="@string/display_category_title">
 
-        <!--Preference
+        <!--
+        <Preference
             android:fragment="com.android.settings.display.ToggleFontSizePreferenceFragment"
             android:key="font_size_preference_screen"
             android:title="@string/title_font_size"
