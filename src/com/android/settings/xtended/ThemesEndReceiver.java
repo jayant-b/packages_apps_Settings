@@ -24,6 +24,7 @@ import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED
 import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_START_THEME_VALUE;
 import static com.android.settings.xtended.XThemeUtils.clearAlarms;
 import static com.android.settings.xtended.XThemeUtils.handleBackgrounds;
+import static com.android.settings.xtended.XThemeUtils.setEndAlarm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -56,7 +57,9 @@ public class ThemesEndReceiver extends BroadcastReceiver {
         String scheduledEndThemeValue = mSharedPreferences.getString(PREF_THEME_SCHEDULED_END_THEME_VALUE, null);
         SharedPreferences.Editor sharedPreferencesEditor = mSharedPreferences.edit();
 
-        if (scheduledEndThemeValue != null) {
+        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction()) && scheduledEndThemeValue != null) {
+            setEndAlarm(context);
+        } else if (scheduledEndThemeValue != null) {
             switch (scheduledEndThemeValue) {
                 case "1":
                     handleBackgrounds(false, context, UiModeManager.MODE_NIGHT_NO, ThemesUtils.SOLARIZED_DARK, mOverlayManager);
