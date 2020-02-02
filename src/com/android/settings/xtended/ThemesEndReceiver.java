@@ -16,18 +16,21 @@
 
 package com.android.settings.xtended;
 
-import static android.content.Context.ALARM_SERVICE;
 import static android.os.UserHandle.USER_SYSTEM;
+import static com.android.settings.xtended.ScheduleFragment.PREF_ALARM_END_TIME;
+import static com.android.settings.xtended.ScheduleFragment.PREF_ALARM_START_TIME;
 import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULE;
+import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_END_THEME;
 import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_END_THEME_VALUE;
+import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_END_TIME;
 import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_REPEAT_DAILY;
+import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_START_THEME;
 import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_START_THEME_VALUE;
+import static com.android.settings.xtended.ScheduleFragment.PREF_THEME_SCHEDULED_START_TIME;
 import static com.android.settings.xtended.XThemeUtils.clearAlarms;
 import static com.android.settings.xtended.XThemeUtils.handleBackgrounds;
 import static com.android.settings.xtended.XThemeUtils.setEndAlarm;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.UiModeManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -114,8 +117,14 @@ public class ThemesEndReceiver extends BroadcastReceiver {
                     .getBoolean(PREF_THEME_SCHEDULED_REPEAT_DAILY, false)) {
                 sharedPreferencesEditor.putString(PREF_THEME_SCHEDULE, "1");
                 sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME_VALUE);
+                sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME);
+                sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_TIME);
                 sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_END_THEME_VALUE);
+                sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_END_THEME);
+                sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_END_TIME);
                 sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_REPEAT_DAILY);
+                sharedPreferencesEditor.remove(PREF_ALARM_START_TIME);
+                sharedPreferencesEditor.remove(PREF_ALARM_END_TIME);
                 sharedPreferencesEditor.apply();
                 clearAlarms(context);
             }
