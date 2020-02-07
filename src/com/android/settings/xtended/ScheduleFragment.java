@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -88,6 +89,7 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
 
         private boolean scheduledStartTheme = false;
         private boolean scheduledEndTheme = false;
+        private int scheduledThemeStatus;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -115,25 +117,7 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
             mThemeScheduledEndTheme = (ListPreference) findPreference(PREF_THEME_SCHEDULED_END_THEME);
             mThemeScheduleRepeat = (SwitchPreference) findPreference(PREF_THEME_SCHEDULED_REPEAT_DAILY);
 
-            if (mThemeScheduledStartTheme != null) {
-                mThemeScheduledStartTheme.setTitle(mContext.getString(R.string.theme_schedule_theme_title));
-                mThemeScheduledStartTheme.setSummary(mContext.getString(R.string.theme_schedule_theme_summary));
-            }
-            if (mThemeScheduledEndTheme != null) {
-                mThemeScheduledEndTheme.setTitle(mContext.getString(R.string.theme_schedule_theme_title));
-                mThemeScheduledEndTheme.setSummary(mContext.getString(R.string.theme_schedule_theme_summary));
-            }
-            if (mThemeScheduleRepeat != null) {
-                if (mThemeScheduleRepeat.isChecked()) {
-                    sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_REPEAT_DAILY);
-                    sharedPreferencesEditor.putBoolean(PREF_THEME_SCHEDULED_REPEAT_DAILY, true);
-                    sharedPreferencesEditor.apply();
-                } else {
-                    sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_REPEAT_DAILY);
-                    sharedPreferencesEditor.putBoolean(PREF_THEME_SCHEDULED_REPEAT_DAILY, false);
-                    sharedPreferencesEditor.apply();
-                }
-            }
+            updateThemeSchedule();
         }
 
         @Override
@@ -193,6 +177,7 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
                     mThemeScheduledStartTheme.setSummary(mThemeScheduledStartTheme.getEntry());
                     new ScheduledStartTheme().execute();
                     scheduledStartTheme = true;
+                    mThemeScheduledStartTheme.setEnabled(false);
                 } else {
                     sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME_VALUE);
                     sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME);
@@ -272,19 +257,14 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
         }
 
         private void updateThemeSchedule() {
-            if (getScheduledEndTheme(mSharedPreferences) == null && getScheduledStartTheme(mSharedPreferences) == null) {
-                mThemeScheduleRepeat.setEnabled(false);
-                mThemeScheduledEndTheme.setEnabled(false);
-                scheduledEndTheme = false;
-            }
-
             if (getScheduledStartTheme(mSharedPreferences) != null) {
                 mThemeScheduleRepeat.setEnabled(false);
+                mThemeScheduledStartTheme.setEnabled(false);
                 mThemeScheduledEndTheme.setEnabled(true);
                 scheduledEndTheme = false;
             }
 
-            if (getScheduledEndTheme(mSharedPreferences) != null && getScheduledStartTheme(mSharedPreferences) != null) {
+            if (getScheduledStartTheme(mSharedPreferences) != null && getScheduledEndTheme(mSharedPreferences) != null) {
                 mThemeScheduleRepeat.setEnabled(false);
                 mThemeScheduledStartTheme.setEnabled(false);
                 mThemeScheduledEndTheme.setEnabled(false);
@@ -292,7 +272,7 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
                 scheduledEndTheme = true;
             }
 
-            if (getScheduledEndTheme(mSharedPreferences) == null && getScheduledStartTheme(mSharedPreferences) == null) {
+            if (getScheduledStartTheme(mSharedPreferences) == null && getScheduledEndTheme(mSharedPreferences) == null) {
                 clearAlarms(mContext);
                 sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME_VALUE);
                 sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME);
@@ -316,16 +296,10 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
                     mThemeScheduledStartTheme.setTitle(getScheduledStartThemeSummary(mSharedPreferences, mContext)
                             + " " + mContext.getString(R.string.theme_schedule_start_scheduled));
                     mThemeScheduledStartTheme.setSummary(getScheduledStartThemeTime(mSharedPreferences));
-                    mThemeScheduledEndTheme.setTitle(getScheduledEndThemeSummary(mSharedPreferences, mContext)
-                            + " " + mContext.getString(R.string.theme_schedule_start_scheduled));
-                    mThemeScheduledEndTheme.setSummary(getScheduledEndThemeTime(mSharedPreferences));
                     scheduledStartTheme = false;
                 } else {
                     mThemeScheduledStartTheme.setTitle(mContext.getString(R.string.theme_schedule_theme_title));
                     mThemeScheduledStartTheme.setSummary(mContext.getString(R.string.theme_schedule_theme_summary));
-
-                    mThemeScheduledEndTheme.setTitle(mContext.getString(R.string.theme_schedule_theme_title));
-                    mThemeScheduledEndTheme.setSummary(mContext.getString(R.string.theme_schedule_theme_summary));
                     scheduledStartTheme = true;
                 }
             }
@@ -334,14 +308,8 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
                     mThemeScheduledEndTheme.setTitle(getScheduledEndThemeSummary(mSharedPreferences, mContext)
                             + " " + mContext.getString(R.string.theme_schedule_start_scheduled));
                     mThemeScheduledEndTheme.setSummary(getScheduledEndThemeTime(mSharedPreferences));
-                    mThemeScheduledEndTheme.setTitle(getScheduledEndThemeSummary(mSharedPreferences, mContext)
-                            + " " + mContext.getString(R.string.theme_schedule_start_scheduled));
-                    mThemeScheduledEndTheme.setSummary(getScheduledEndThemeTime(mSharedPreferences));
                     scheduledEndTheme = false;
                 } else {
-                    mThemeScheduledEndTheme.setTitle(mContext.getString(R.string.theme_schedule_theme_title));
-                    mThemeScheduledEndTheme.setSummary(mContext.getString(R.string.theme_schedule_theme_summary));
-
                     mThemeScheduledEndTheme.setTitle(mContext.getString(R.string.theme_schedule_theme_title));
                     mThemeScheduledEndTheme.setSummary(mContext.getString(R.string.theme_schedule_theme_summary));
                     scheduledEndTheme = true;
@@ -361,12 +329,32 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
             mThemeSchedule.setSummary(mThemeSchedule.getEntry());
         }
 
+        private void clearAll() {
+            sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME_VALUE);
+            sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_THEME);
+            sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_START_TIME);
+            sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_END_THEME_VALUE);
+            sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_END_THEME);
+            sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_END_TIME);
+            sharedPreferencesEditor.remove(PREF_THEME_SCHEDULED_REPEAT_DAILY);
+            sharedPreferencesEditor.remove(PREF_ALARM_START_TIME);
+            sharedPreferencesEditor.remove(PREF_ALARM_END_TIME);
+            sharedPreferencesEditor.commit();
+            mThemeScheduleRepeat.setVisible(false);
+            mThemeScheduledStartTheme.setVisible(false);
+            mThemeScheduledEndTheme.setVisible(false);
+            mThemeSchedule.setValue("1");
+            scheduledStartTheme = false;
+            scheduledEndTheme = false;
+        }
+
         public void showStartTimePicker() {
-            new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+            TimePickerDialog dialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                     mStartDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     mStartDate.set(Calendar.MINUTE, minute);
+                    scheduledThemeStatus = 1;
                     setStartTime(mContext, mStartDate);
                     setStartAlarm(mContext);
                     ComponentName mStartReceiver = new ComponentName(mContext, ThemesStartReceiver.class);
@@ -377,21 +365,41 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
                                 + " " + mContext.getString(R.string.theme_schedule_start_scheduled));
                         mThemeScheduledStartTheme.setSummary(timeFormat.format(mStartDate.getTime()));
                         sharedPreferencesEditor.putString(PREF_THEME_SCHEDULED_START_TIME, timeFormat.format(mStartDate.getTime())).commit();
+                        mThemeScheduledStartTheme.setEnabled(false);
                         mThemeScheduledEndTheme.setVisible(true);
                         mThemeScheduledEndTheme.setEnabled(true);
                         mThemeScheduleRepeat.setEnabled(false);
                         scheduledStartTheme = true;
                     }
                 }
-            }, mStartDate.get(Calendar.HOUR_OF_DAY), mStartDate.get(Calendar.MINUTE), false).show();
+            }, mStartDate.get(Calendar.HOUR_OF_DAY), mStartDate.get(Calendar.MINUTE), false);
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    scheduledThemeStatus = 2;
+                    clearAlarms(mContext);
+                    clearAll();
+                }
+            });
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    if (scheduledThemeStatus == 0) {
+                        clearAlarms(mContext);
+                        clearAll();
+                    }
+                }
+            });
+            dialog.show();
         }
 
         public void showEndTimePicker() {
-            new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
+            TimePickerDialog dialog = new TimePickerDialog(mContext, new TimePickerDialog.OnTimeSetListener() {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                     mEndDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     mEndDate.set(Calendar.MINUTE, minute);
+                    scheduledThemeStatus = 1;
                     setEndTime(mContext, mEndDate);
                     setEndAlarm(mContext);
                     ComponentName mEndReceiver = new ComponentName(mContext, ThemesEndReceiver.class);
@@ -408,7 +416,25 @@ public class ScheduleFragment extends SettingsPreferenceFragment implements Shar
                         scheduledEndTheme = true;
                     }
                 }
-            }, mEndDate.get(Calendar.HOUR_OF_DAY), mEndDate.get(Calendar.MINUTE), false).show();
+            }, mEndDate.get(Calendar.HOUR_OF_DAY),  mEndDate.get(Calendar.MINUTE), false);
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    scheduledThemeStatus = 2;
+                    clearAlarms(mContext);
+                    clearAll();
+                }
+            });
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    if (scheduledThemeStatus == 0) {
+                        clearAlarms(mContext);
+                        clearAll();
+                    }
+                }
+            });
+            dialog.show();
         }
 
         @Override
