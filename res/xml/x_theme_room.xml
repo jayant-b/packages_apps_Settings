@@ -27,6 +27,11 @@
         android:entryValues="@array/theme_type_values"
         android:defaultValue="1"/>
 
+    <Preference
+        android:key="theme_scheduler"
+        android:title="@string/theme_schedule_title"
+        android:fragment="com.android.settings.xtended.ScheduleFragment" />
+
     <net.margaritov.preference.colorpicker.ColorPickerPreference
         android:key="accent_color"
         android:title="@string/accent_color"

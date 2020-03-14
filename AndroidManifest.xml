@@ -3350,6 +3350,19 @@
             <meta-data android:name="com.android.settings.FRAGMENT_CLASS"
                 android:value="com.msm.xtended.fragments.GamingMode" />
         </activity>
+
+        <receiver
+            android:name=".ThemesStartReceiver">
+            <intent-filter >
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".ThemesEndReceiver">
+            <intent-filter >
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
 

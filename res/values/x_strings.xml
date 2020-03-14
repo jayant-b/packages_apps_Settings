@@ -395,4 +395,17 @@
     <!-- Label for device's hardware ram size [CHAR LIMIT=40] -->
     <string name="total_ram">Total RAM</string>
 
+    <!-- Theme schedule -->
+    <string name="theme_schedule_title">Schedule</string>
+    <string name="theme_schedule_summary">Set a schedule for system themes</string>
+    <string name="theme_schedule_dyn_summary">theme is scheduled</string>
+    <string name="theme_schedule_theme_title">Schedule theme</string>
+    <string name="theme_schedule_theme_summary">Select a theme to schedule</string>
+    <string name="theme_schedule_none">None</string>
+    <string name="theme_schedule_custom_time">Turns on at a custom time</string>
+    <string name="theme_schedule_applied">theme applied</string>
+    <string name="theme_schedule_start_scheduled">theme starts at</string>
+    <string name="theme_schedule_repeat_title">Repeat schedule</string>
+    <string name="theme_schedule_repeat_summary">Repeats the schedule daily</string>
+
 </resources>
